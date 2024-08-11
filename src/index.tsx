@@ -26,6 +26,13 @@ type HttpGetResult = {
   body: string;
 };
 
+type HttpPostResult = {
+  statusCode: number;
+  requestHeaders: Headers;
+  responseHeaders: Headers;
+  body: string;
+};
+
 type RequestOptions = {
   headers?: { [key: string]: string };
   params?: { [key: string]: string };
@@ -33,16 +40,24 @@ type RequestOptions = {
 
 interface NativeHttpClientApi {
   get(url: string, optionsJson?: string): Promise<string>;
+  post(url: string, optionsJson?: string): Promise<string>;
 }
 
 interface NativeHttpClientApiWrapper {
   get(url: string, options?: RequestOptions): Promise<HttpGetResult>;
+  post(url: string, options?: RequestOptions): Promise<HttpPostResult>;
 }
 
 export const client: NativeHttpClientApiWrapper = {
   get: async (url, options) => {
     const optionsJson = options ? JSON.stringify(options) : undefined;
     const output = await HttpClient.get(url, optionsJson);
+    return JSON.parse(output);
+  },
+
+  post: async (url, options) => {
+    const optionsJson = options ? JSON.stringify(options) : undefined;
+    const output = await HttpClient.post(url, optionsJson);
     return JSON.parse(output);
   },
 };
